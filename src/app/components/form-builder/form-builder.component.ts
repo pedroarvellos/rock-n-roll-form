@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { FormBuilderInput, ValidationObject } from './form-builder.type';
-import { getValidatorErrorMessage, getValidatorType } from './form-builder.validation';
+import { ControlObject, FormBuilderInput, ValidationObject } from './form-builder.type';
+import { getValidatorErrorMessage, getValidatorType, passwordMustNotHaveFirstAndLastName } from './form-builder.validation';
 
 @Component({
   selector: 'app-form-builder',
@@ -10,19 +10,31 @@ import { getValidatorErrorMessage, getValidatorType } from './form-builder.valid
 })
 export class FormBuilderComponent implements OnInit {
   @Input()
-  public inputList: Array<FormBuilderInput> = [];
+  public inputList: FormBuilderInput | null = null;
+  @Input()
+  public isLoading: boolean = false;
   @Output() 
-  public submit: EventEmitter<any> = new EventEmitter;
-  public form: FormGroup;
+  public submitForm: EventEmitter<any> = new EventEmitter;
+  public form: FormGroup | null = null;
 
   constructor(private formBuilder: FormBuilder) {
-    this.form = this.formBuilder.group({});
+    this.form = null;
   }
 
   public ngOnInit(): void {
-    this.inputList.forEach(input => {
-      this.form.addControl(input.keyName, this.formBuilder.control('', this.getValidator(input.validationList)));
-    });
+    const generalValidators = this.inputList?.generalValidation;
+    let controls: {[key: string]: AbstractControl}  = {};
+    this.inputList?.controls.filter((input: ControlObject) => {
+      controls = {... controls, ...{[input.keyName]: this.formBuilder.control('', this.getValidator(input.validationList))}}
+    })
+
+    if(generalValidators?.avoidFirstAndLastNameInPassword) {
+      this.form = this.formBuilder.group(controls, {
+        validator: passwordMustNotHaveFirstAndLastName(generalValidators?.avoidFirstAndLastNameInPassword.firstNameFieldKey, generalValidators?.avoidFirstAndLastNameInPassword.lastNameFieldKey, generalValidators?.avoidFirstAndLastNameInPassword.passwordFieldKey)
+      })
+    } else {
+      this.form = this.formBuilder.group(controls)
+    }
   }
 
   private getValidator(validationList: ValidationObject): Array<ValidatorFn> {
@@ -31,12 +43,12 @@ export class FormBuilderComponent implements OnInit {
     return validationErrorsList;
   }
 
-  public getControl(controlName: string): AbstractControl {
-    return this.form.controls[controlName]; 
+  public getControl(controlName: string): AbstractControl | null {
+    return this.form ? this.form.controls[controlName] : null; 
   }
 
   public getErrorMessage(keyName: string): Array<string> {
-    const errorObject: ValidationErrors | null = this.getControl(keyName).errors;
+    const errorObject: ValidationErrors | null | undefined = this.getControl(keyName)?.errors;
     let validationErrorMessageList: Array<string> = [];
     
     if(errorObject) {
@@ -47,7 +59,7 @@ export class FormBuilderComponent implements OnInit {
   }
 
   public onSubmit(): void {
-    this.submit.emit(this.form.value);
-    // this.form.reset()
+    this.submitForm.emit(this.form?.value);
+    this.form?.reset();
   }
 }

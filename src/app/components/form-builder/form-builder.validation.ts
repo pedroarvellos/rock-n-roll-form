@@ -1,15 +1,35 @@
-import { AbstractControl, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
+import { AbstractControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
 import { ValidationKey, ValidationObject } from "./form-builder.type";
 
 const EMAIL_REGEX = '^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$';
-const PASSWORD_REGEX = '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])';
+const PASSWORD_REGEX = '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])';
 
-// closure's magic (◍•ᴗ•◍)❤
 function regexValidation(control: AbstractControl, nameRegEx: RegExp, validation: ValidationKey, numeric?: number) {
   if (!nameRegEx.test(control.value)) {
     return { [validation]: numeric ? numeric : true };
   }
   return null;
+}
+
+export function passwordMustNotHaveFirstAndLastName(firstName: string, lastName: string, password: string) {
+  return (formGroup: FormGroup) => {
+      const passwordControl = formGroup.controls[password];
+
+      const firstNameValue = String(formGroup.controls[firstName].value).toUpperCase();
+      const lastNameValue = String(formGroup.controls[lastName].value).toUpperCase();
+      const passwordValue = String(passwordControl.value).toUpperCase();
+
+      // does not check if already found an error
+      if (passwordControl.errors && !passwordControl.errors.mustMatch) {
+        return;
+    }
+
+      if (passwordValue.includes(firstNameValue) || passwordValue.includes(lastNameValue)) {
+        passwordControl.setErrors({ avoidFirstAndLastNameInPassword: true });
+      } else {
+        passwordControl.setErrors(null);
+      }
+  }
 }
 
 export const getValidatorType = (validation: ValidationObject): Array<ValidatorFn> => {
@@ -20,6 +40,7 @@ export const getValidatorType = (validation: ValidationObject): Array<ValidatorF
     }
 
     if(validation['max']) {
+      // closure's magic (◍•ᴗ•◍)❤
       validationErrorList.push((control: AbstractControl) => regexValidation(control, new RegExp(`^.{0,${validation['max']}}$`), 'max', validation['max'] as number));
     }
 
@@ -34,7 +55,6 @@ export const getValidatorType = (validation: ValidationObject): Array<ValidatorF
     if(validation['password']) {
       validationErrorList.push((control: AbstractControl) => regexValidation(control, new RegExp(PASSWORD_REGEX), 'password'));
     }
-    
 
     return validationErrorList;
 }
@@ -59,7 +79,11 @@ export const getValidatorErrorMessage = (validation: ValidationErrors): Array<st
     }
     
     if (validation['password']) {
-      validationErrorMessageList.push('Please, enter a password with uppercase, lowercase, special characters and numbers.');
+      validationErrorMessageList.push('Please, enter a password with uppercase, lowercase and numbers.');
+    }
+    
+    if (validation['avoidFirstAndLastNameInPassword']) {
+      validationErrorMessageList.push('Please, avoid entering your first and last name.');
     }
 
     return validationErrorMessageList;
