@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
-import { User } from 'src/app/services/sign-up.type';
-import { getSignUpStatus } from 'src/app/store/selectors/sign-up.selectors';
+import { User } from '../../services/sign-up.type';
+import { getSignUpStatus } from '../../store/selectors/sign-up.selectors';
 import * as signUpActions from '../../store/actions/sign-up.action';
 import { FormBuilderInput } from '../form-builder/form-builder.type';
 import { Signup } from './sign-up.type';
