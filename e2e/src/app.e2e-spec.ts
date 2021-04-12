@@ -1,16 +1,39 @@
 import { browser, logging } from 'protractor';
 import { AppPage } from './app.po';
 
-describe('workspace-project App', () => {
+describe('Form tests', () => {
   let page: AppPage;
 
   beforeEach(() => {
     page = new AppPage();
   });
 
-  it('should display welcome message', async () => {
+  it('should create a user', async () => {
     await page.navigateTo();
-    expect(await page.getTitleText()).toEqual('shelby-form app is running!');
+    await page.enterValueOnField('firstName', 'Thomas');
+    await page.enterValueOnField('lastName', 'Shelby');
+    await page.enterValueOnField('email', 'thomas@shelby.co.uk');
+    await page.enterValueOnField('password', 'IAmNotBillyKimber876');
+    await page.submitForm()
+    expect(await page.isConfirmationAlertPresent()).toBe(true);
+  });
+
+  it('should not create a user with the password containing the first and last names', async () => {
+    await page.navigateTo();
+    await page.enterValueOnField('firstName', 'Thomas');
+    await page.enterValueOnField('lastName', 'Shelby');
+    await page.enterValueOnField('email', 'thomas@shelby.co.uk');
+    await page.enterValueOnField('password', 'ThomasShelby123');
+    expect(await page.isButtonEnabled()).toBe(false);
+  });
+
+  it('should not create a user with wrong email', async () => {
+    await page.navigateTo();
+    await page.enterValueOnField('firstName', 'Thomas');
+    await page.enterValueOnField('lastName', 'Shelby');
+    await page.enterValueOnField('email', 'thomas@shelby');
+    await page.enterValueOnField('password', 'IAmNotBillyKimber876');
+    expect(await page.isButtonEnabled()).toBe(false);
   });
 
   afterEach(async () => {

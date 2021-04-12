@@ -1,0 +1,22 @@
+<form *ngIf="form" [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+    <div *ngFor="let input of inputList?.controls" class="mb-3">
+        <label [for]="input.keyName" class="form-label">{{ input.label }}</label>
+        <input [type]="input.type" class="form-control" [id]="input.keyName" [formControlName]="input.keyName" />
+        <div *ngIf="getControl(input.keyName)?.errors && !getControl(input.keyName)?.pristine">
+            <div *ngFor="let message of getErrorMessage(input.keyName)" >
+                <small class="form-text text-muted">
+                    {{ message }}
+                </small>
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary" id="submit" [disabled]="form?.invalid">
+        <div *ngIf="isLoading; else isNotLoading">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Loading...
+        </div>
+        <ng-template #isNotLoading>
+            Submit
+        </ng-template>
+    </button>
+</form>
