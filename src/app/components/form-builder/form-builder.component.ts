@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { ControlObject, FormBuilderInput, ValidationObject } from './form-builder.type';
-import { getValidatorErrorMessage, getValidatorType, passwordMustNotHaveFirstAndLastName } from './form-builder.validation';
+import { ControlObject, FormBuilderInput, GeneralValidationObject, ValidationObject } from './form-builder.type';
+import { getGeneralValidatorType, getValidatorErrorMessage, getValidatorType, passwordMustNotHaveFirstAndLastName } from './form-builder.validation';
 
 @Component({
   selector: 'app-form-builder',
@@ -22,23 +22,33 @@ export class FormBuilderComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    const generalValidators = this.inputList?.generalValidation;
-    let controls: {[key: string]: AbstractControl}  = {};
-    this.inputList?.controls.filter((input: ControlObject) => {
-      controls = {... controls, ...{[input.keyName]: this.formBuilder.control('', this.getValidator(input.validationList))}}
-    })
-
-    if(generalValidators?.avoidFirstAndLastNameInPassword) {
-      this.form = this.formBuilder.group(controls, {
-        validator: passwordMustNotHaveFirstAndLastName(generalValidators?.avoidFirstAndLastNameInPassword.firstNameFieldKey, generalValidators?.avoidFirstAndLastNameInPassword.lastNameFieldKey, generalValidators?.avoidFirstAndLastNameInPassword.passwordFieldKey)
-      })
-    } else {
-      this.form = this.formBuilder.group(controls)
+    if(this.inputList) {
+      let controls: {[key: string]: AbstractControl} = {};
+      
+      this.inputList?.controls.filter((input: ControlObject) => {
+        controls = {... controls, ...{[input.keyName]: this.formBuilder.control('', this.getValidators(input.validationList ? input.validationList : null))}};
+      });
+  
+      this.form = new FormGroup(controls, this.getGeneralValidators(this.inputList?.generalValidation ? this.inputList.generalValidation : null));
     }
   }
 
-  private getValidator(validationList: ValidationObject): Array<ValidatorFn> {
-    const validationErrorsList: ValidatorFn[] = getValidatorType(validationList);
+  private getGeneralValidators(generalValidationList: GeneralValidationObject | null) {
+    let generalValidationErrorsList: Array<ValidatorFn> = [];
+
+    if(generalValidationList) {
+      generalValidationErrorsList = getGeneralValidatorType(generalValidationList);
+    }
+
+    return generalValidationErrorsList;
+  }
+
+  private getValidators(validationList: ValidationObject | null): Array<ValidatorFn> {
+    let validationErrorsList: Array<ValidatorFn> = [];
+    
+    if(validationList) {
+      validationErrorsList = getValidatorType(validationList);
+    }
 
     return validationErrorsList;
   }

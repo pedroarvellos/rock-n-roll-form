@@ -20,13 +20,13 @@ export class SignUpComponent {
         keyName: 'firstName',
         label: 'First Name',
         type: 'text',
-        validationList: { required: true,  max: 15 }
+        validationList: { required: true, max: 15 }
       },
       {
         keyName: 'lastName',
         label: 'Last Name',
         type: 'text',
-        validationList: { required: true,  max: 15 }
+        validationList: { required: true, max: 15 }
       },
       {
         keyName: 'email',
@@ -48,7 +48,7 @@ export class SignUpComponent {
         passwordFieldKey: 'password',
       }
     }
-  }
+  };
 
   constructor(private readonly store: Store) {
     this.isLoading$ = this.store.select(getSignUpStatus);
@@ -59,8 +59,8 @@ export class SignUpComponent {
       firstName: signup.firstName,
       lastName: signup.lastName,
       email: signup.email
-    }
-    
+    };
+
     this.store.dispatch(signUpActions.signup({ user }));
   }
 }

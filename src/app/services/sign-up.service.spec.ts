@@ -4,7 +4,6 @@ import { environment } from 'src/environments/environment';
 import { SignUpService } from './sign-up.service';
 import { User } from './sign-up.type';
 
-
 const mockUser: User = {
   firstName: 'Thomas',
   lastName: 'Shelby',

@@ -6,7 +6,7 @@ export interface SignUpState {
   user: User | null;
   isLoading: boolean;
   error: string | null;
-}
+};
 
 export const initialSignUpState: SignUpState = {
   user: null,
@@ -47,4 +47,4 @@ const reducer = createReducer(
 
 export function signUpReducer(state: SignUpState | undefined, action: Action): SignUpState {
   return reducer(state, action);
-}
+};

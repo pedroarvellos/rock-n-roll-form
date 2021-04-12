@@ -27,7 +27,7 @@ export class SignUpEffects {
         })
       ))
     )
-  )
+  );
 
   public displaySuccess$ = createEffect(() =>
     this.actions$.pipe(
