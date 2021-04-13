@@ -1,4 +1,5 @@
-export type ValidationKey = 'required' | 'email' | 'password' | 'max' | 'min';
+
+export type ValidationKey = 'required' | 'email' | 'max' | 'min' | 'shouldContainUpperAndLowerCase' | 'shouldContainNumber' | 'shouldContainSpecialCharacter';
 
 export type ValidationObject = { [v in ValidationKey]?: boolean | number };
 
@@ -9,24 +10,21 @@ export type ControlObject = {
   validationList?: ValidationObject;
 };
 
+export type GeneralValidationKey = 'avoidFirstAndLastNameInPassword';
+
 export type AvoidFirstAndLastNameInPassword = {
   firstNameFieldKey: string;
   lastNameFieldKey: string;
   passwordFieldKey: string;
 };
 
-// just as example if you want to enhance the general validators
-export type CheckPasswordFields = {
-  passwordFieldKey: string;
-  confirmationFieldKey: string;
-};
-
 export type GeneralValidationObject = {
   avoidFirstAndLastNameInPassword?: AvoidFirstAndLastNameInPassword;
-  checkPasswordFields?: CheckPasswordFields;
 };
 
 export type FormBuilderInput = {
   controls: Array<ControlObject>;
   generalValidation?: GeneralValidationObject;
 };
+
+export type ValidationErrorsWithKnownKeys = {[key in ValidationKey | GeneralValidationKey]?: any }

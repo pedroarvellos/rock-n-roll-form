@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { User } from '../../services/sign-up.type';
-import { getSignUpStatus } from '../../store/selectors/sign-up.selectors';
 import * as signUpActions from '../../store/actions/sign-up.action';
+import { getSignUpStatus } from '../../store/selectors/sign-up.selectors';
 import { FormBuilderInput } from '../form-builder/form-builder.type';
 import { Signup } from './sign-up.type';
 
@@ -20,13 +20,13 @@ export class SignUpComponent {
         keyName: 'firstName',
         label: 'First Name',
         type: 'text',
-        validationList: { required: true, max: 15 }
+        validationList: { required: true, max: 40 }
       },
       {
         keyName: 'lastName',
         label: 'Last Name',
         type: 'text',
-        validationList: { required: true, max: 15 }
+        validationList: { required: true, max: 40 }
       },
       {
         keyName: 'email',
@@ -38,7 +38,14 @@ export class SignUpComponent {
         keyName: 'password',
         label: 'Password',
         type: 'password',
-        validationList: { required: true, password: true, min: 8 }
+        validationList: {
+          required: true,
+          shouldContainUpperAndLowerCase: true,
+          // in case you want to add some extra validation, just uncomment the code below.
+          // shouldContainNumber: true,
+          // shouldContainSpecialCharacter: true,
+          min: 8
+        }
       },
     ],
     generalValidation: {

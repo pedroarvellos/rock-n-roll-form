@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { ControlObject, FormBuilderInput, GeneralValidationObject, ValidationObject } from './form-builder.type';
-import { getGeneralValidatorType, getValidatorErrorMessage, getValidatorType, passwordMustNotHaveFirstAndLastName } from './form-builder.validation';
+import { AbstractControl, FormBuilder, FormGroup, ValidatorFn } from '@angular/forms';
+import { ControlObject, FormBuilderInput, GeneralValidationObject, ValidationErrorsWithKnownKeys, ValidationObject } from './form-builder.type';
+import { getGeneralValidatorType, getValidatorErrorMessage, getValidatorType } from './validation/form-builder.validation';
 
 @Component({
   selector: 'app-form-builder',
@@ -58,7 +58,7 @@ export class FormBuilderComponent implements OnInit {
   }
 
   public getErrorMessage(keyName: string): Array<string> {
-    const errorObject: ValidationErrors | null | undefined = this.getControl(keyName)?.errors;
+    const errorObject: ValidationErrorsWithKnownKeys = this.getControl(keyName)?.errors as ValidationErrorsWithKnownKeys;
     let validationErrorMessageList: Array<string> = [];
     
     if(errorObject) {
