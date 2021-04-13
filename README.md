@@ -24,4 +24,4 @@ Run `npm run e2e` to execute the end-to-end tests via [Protractor](http://www.pr
 ## Notes
 
 * Although in a real life scenario we'd create more test cases, to make things simpler I decided to create only unit tests for the store (effects, actions, reducers and selectors), and the main e2e use cases in protractor. I believe for this purpose it covers well. 😊
-* There are several ways to do email validation, you can use Angular's email validator, regEx or even call an API to check if the domain exists and do an async validation. I understood that for this project a regEx validation is also enough, but we can for sure improve it calling a domain validation API if necessary.
+* There are several ways to do email validation, you can use Angular's email validator, regEx or even call an API to check if the domain exists and do an async validation. I understood that for this project a regEx validation is also enough, but we can for sure improve it by calling a domain validation API if necessary.
