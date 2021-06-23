@@ -11,95 +11,106 @@ import { SignUpState } from '../reducers/sign-up.reducer';
 import { SignUpEffects } from './sign-up.effects';
 
 const initialState: SignUpState = {
-    user: null,
-    isLoading: false,
-    error: null,
+  user: null,
+  isLoading: false,
+  error: null,
 };
 
 const mockUser: User = {
-    firstName: 'Thomas',
-    lastName: 'Shelby',
-    email: 'thomas@shelby.co.uk'
+  firstName: 'Thomas',
+  lastName: 'Shelby',
+  email: 'thomas@shelby.co.uk'
 };
 
 class MockSignUpService {
-    signUp() {
-        return of(null);
-    }
+  signUp() {
+    return of(null);
+  }
 }
 
 class MockToastrService {
-    success(description: string, title: string) {
-        return of(null);
-    }
-    
-    error(description: string, title: string) {
-        return of(null);
-    }
+  success(description: string, title: string): Observable<null> {
+    return of(null);
+  }
+
+  error(description: string, title: string): Observable<null> {
+    return of(null);
+  }
 }
 
 describe('SignUpEffects', () => {
-    let actions$: Observable<any>;
-    let effects: SignUpEffects;
-    let store: MockStore<SignUpState>;
-    let httpService: SignUpService;
-    let toastrService: ToastrService;
+  let actions$: Observable<any>;
+  let effects: SignUpEffects;
+  let store: MockStore<SignUpState>;
+  let httpService: SignUpService;
+  let toastrService: ToastrService;
 
-    beforeEach(() => {
-        TestBed.configureTestingModule({
-            imports: [
-                ToastrModule.forRoot({
-                    positionClass: 'toast-top-center'
-                })
-            ],
-            providers: [
-                SignUpEffects,
-                provideMockActions(() => actions$),
-                provideMockStore({ initialState }),
-                { provide: SignUpService, useClass: MockSignUpService },
-                { provide: ToastrService, useClass: MockToastrService },
-            ],
-        });
-
-        effects = TestBed.inject(SignUpEffects);
-        store = TestBed.inject(MockStore);
-        httpService = TestBed.inject(SignUpService);
-        toastrService = TestBed.inject(ToastrService);
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        ToastrModule.forRoot({
+          positionClass: 'toast-top-center'
+        })
+      ],
+      providers: [
+        SignUpEffects,
+        provideMockActions(() => actions$),
+        provideMockStore({initialState}),
+        {provide: SignUpService, useClass: MockSignUpService},
+        {provide: ToastrService, useClass: MockToastrService},
+      ],
     });
 
-    it('should be created', () => {
-        expect(effects).toBeTruthy();
+    effects = TestBed.inject(SignUpEffects);
+    store = TestBed.inject(MockStore);
+    httpService = TestBed.inject(SignUpService);
+    toastrService = TestBed.inject(ToastrService);
+  });
+
+  it('should be created', () => {
+    expect(effects).toBeTruthy();
+  });
+
+  it('should sign up', (done) => {
+    const spy = spyOn(httpService, 'signUp').and.callThrough();
+    actions$ = of({type: signUpActions.SIGN_UP, user: mockUser});
+
+    effects.signUp$.pipe(pairwise()).subscribe(([fAction, sAction]) => {
+      expect(fAction).toEqual(signUpActions.signUpSuccess({user: mockUser}));
+      expect(sAction).toEqual(signUpActions.signUpAlertSuccess({
+        title: 'Success',
+        description: 'User created successfully!'
+      }));
+      expect(spy).toHaveBeenCalledTimes(1);
+      done();
+    });
+  });
+
+  it('should display success', (done) => {
+    const spy = spyOn(toastrService, 'success').and.callThrough();
+    actions$ = of({
+      type: signUpActions.SIGN_UP_ALERT_SUCCESS,
+      title: 'Success',
+      description: 'User created successfully!'
     });
 
-    it('should sign up', (done) => {
-        const spy = spyOn(httpService, 'signUp').and.callThrough();
-        actions$ = of({ type: signUpActions.SIGN_UP, user: mockUser });
+    effects.displaySuccess$.subscribe(() => {
+      expect(spy).toHaveBeenCalledTimes(1);
+      done();
+    });
+  });
 
-        effects.signUp$.pipe(pairwise()).subscribe(([fAction, sAction]) => {
-            expect(fAction).toEqual(signUpActions.signUpSuccess({ user: mockUser }));
-            expect(sAction).toEqual(signUpActions.signUpAlertSuccess({ title: 'Success', description: 'User created successfully!' }));
-            expect(spy).toHaveBeenCalledTimes(1);
-            done();
-        });
+  it('should display error', (done) => {
+    const spy = spyOn(toastrService, 'error').and.callThrough();
+    actions$ = of({
+      type: signUpActions.SIGN_UP_ALERT_ERROR,
+      title: 'Error',
+      description: 'It was not possible to create user!'
     });
 
-    it('should display success', (done) => {
-        const spy = spyOn(toastrService, 'success').and.callThrough();
-        actions$ = of({ type: signUpActions.SIGN_UP_ALERT_SUCCESS, title: 'Success', description: 'User created successfully!' });
-
-        effects.displaySuccess$.subscribe(() => {
-            expect(spy).toHaveBeenCalledTimes(1);
-            done();
-        });
+    effects.displayError$.subscribe(() => {
+      expect(spy).toHaveBeenCalledTimes(1);
+      done();
     });
-
-    it('should display error', (done) => {
-        const spy = spyOn(toastrService, 'error').and.callThrough();
-        actions$ = of({ type: signUpActions.SIGN_UP_ALERT_ERROR, title: 'Error', description: 'It was not possible to create user!' });
-
-        effects.displayError$.subscribe(() => {
-            expect(spy).toHaveBeenCalledTimes(1);
-            done();
-        });
-    });
+  });
 });

@@ -1,17 +1,14 @@
-import {
-  ActionReducerMap,
-  MetaReducer
-} from '@ngrx/store';
+import { ActionReducerMap, MetaReducer } from '@ngrx/store';
 import { environment } from '../../environments/environment';
-import { signUpReducer, SignUpState  } from './reducers/sign-up.reducer';
+import { signUpReducer, SignUpState } from './reducers/sign-up.reducer';
 
 
 export interface State {
-  signUpReducer: SignUpState
+  signUpReducer: SignUpState;
 }
 
 export const reducers: ActionReducerMap<State> = {
-  signUpReducer: signUpReducer
+  signUpReducer
 };
 
 

@@ -20,7 +20,7 @@ export class AppPage {
   async submitForm(): Promise<unknown> {
     const submit: ElementFinder = element(by.id('submit'));
 
-    browser.wait(this.EC.elementToBeClickable(submit), this.timeout)
+    browser.wait(this.EC.elementToBeClickable(submit), this.timeout);
     return submit.click();
   }
 
@@ -33,7 +33,7 @@ export class AppPage {
   async isConfirmationAlertPresent(): Promise<unknown> {
     const alert: ElementFinder = element(by.css('.toast-success'));
 
-    browser.wait(this.EC.visibilityOf(alert), this.timeout)
+    browser.wait(this.EC.visibilityOf(alert), this.timeout);
     return alert.isPresent();
   }
 }

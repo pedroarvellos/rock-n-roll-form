@@ -1,15 +1,25 @@
-import { AbstractControl, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
-import { GeneralValidationObject, ValidationErrorsWithKnownKeys, ValidationKey, ValidationObject } from "../form-builder.type";
-import { EMAIL_REGEX, NUMBER_REGEX, SPECIAL_CHARACTERS_REGEX, UPPERCASE_AND_LOWERCASE_REGEX } from "./constraints.validation";
+import { AbstractControl, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import {
+  GeneralValidationObject,
+  ValidationErrorsWithKnownKeys,
+  ValidationKey,
+  ValidationObject
+} from '../form-builder.type';
+import {
+  EMAIL_REGEX,
+  NUMBER_REGEX,
+  SPECIAL_CHARACTERS_REGEX,
+  UPPERCASE_AND_LOWERCASE_REGEX
+} from './constraints.validation';
 
-function regexValidation(control: AbstractControl, nameRegEx: RegExp, validation: ValidationKey, numeric?: number) {
+function regexValidation(control: AbstractControl, nameRegEx: RegExp, validation: ValidationKey, numeric?: number): { [p: string]: number | boolean } | null {
   if (!nameRegEx.test(control.value)) {
-    return { [validation]: numeric ? numeric : true };
+    return {[validation]: numeric ? numeric : true};
   }
   return null;
 }
 
-export function passwordMustNotHaveFirstAndLastName(firstName: string, lastName: string, password: string) {
+export function passwordMustNotHaveFirstAndLastName(firstName: string, lastName: string, password: string): (formGroup: any) => (ValidationErrors | null) {
   return (formGroup: any): ValidationErrors | null => {
     const passwordControl = formGroup.controls[password];
 
@@ -23,13 +33,13 @@ export function passwordMustNotHaveFirstAndLastName(firstName: string, lastName:
     }
 
     if (passwordValue.includes(firstNameValue) || passwordValue.includes(lastNameValue)) {
-      passwordControl.setErrors({ avoidFirstAndLastNameInPassword: true });
+      passwordControl.setErrors({avoidFirstAndLastNameInPassword: true});
     } else {
       passwordControl.setErrors(null);
     }
 
     return null;
-  }
+  };
 }
 
 export const getValidatorType = (validation: ValidationObject): Array<ValidatorFn> => {
@@ -41,42 +51,76 @@ export const getValidatorType = (validation: ValidationObject): Array<ValidatorF
 
   if (validation.max) {
     // closure's magic (◍•ᴗ•◍)❤
-    validationErrorList.push((control: AbstractControl) => regexValidation(control, new RegExp(`^.{0,${validation.max}}$`), 'max', validation.max as number));
+    validationErrorList.push(
+      (control: AbstractControl) => regexValidation(control, new RegExp(`^.{0,${validation.max}}$`),
+        'max',
+        validation.max as number)
+    );
   }
 
   if (validation.min) {
-    validationErrorList.push((control: AbstractControl) => regexValidation(control, new RegExp(`^.{${validation.min},}$`), 'min', validation.min as number));
+    validationErrorList.push(
+      (control: AbstractControl) => regexValidation(
+        control, new RegExp(`^.{${validation.min},}$`),
+        'min',
+        validation.min as number
+      )
+    );
   }
 
   if (validation.email) {
-    validationErrorList.push((control: AbstractControl) => regexValidation(control, new RegExp(EMAIL_REGEX), 'email'));
+    validationErrorList.push(
+      (control: AbstractControl) => regexValidation(
+        control,
+        new RegExp(EMAIL_REGEX),
+        'email'
+      )
+    );
   }
 
   if (validation.shouldContainUpperAndLowerCase) {
-    validationErrorList.push((control: AbstractControl) => regexValidation(control, new RegExp(UPPERCASE_AND_LOWERCASE_REGEX), 'shouldContainUpperAndLowerCase'));
+    validationErrorList.push(
+      (control: AbstractControl) => regexValidation(
+        control,
+        new RegExp(UPPERCASE_AND_LOWERCASE_REGEX),
+        'shouldContainUpperAndLowerCase'
+      )
+    );
   }
 
   if (validation.shouldContainNumber) {
-    validationErrorList.push((control: AbstractControl) => regexValidation(control, new RegExp(NUMBER_REGEX), 'shouldContainNumber'));
+    validationErrorList.push(
+      (control: AbstractControl) => regexValidation(
+        control,
+        new RegExp(NUMBER_REGEX),
+        'shouldContainNumber'
+      )
+    );
   }
 
   if (validation.shouldContainSpecialCharacter) {
-    validationErrorList.push((control: AbstractControl) => regexValidation(control, new RegExp(SPECIAL_CHARACTERS_REGEX), 'shouldContainSpecialCharacter'));
+    validationErrorList.push(
+      (control: AbstractControl) => regexValidation(
+        control,
+        new RegExp(SPECIAL_CHARACTERS_REGEX),
+        'shouldContainSpecialCharacter'
+      )
+    );
   }
 
   return validationErrorList;
-}
+};
 
 export const getGeneralValidatorType = (generalValidation: GeneralValidationObject): Array<ValidatorFn> => {
   const generalValidationErrorsList: Array<ValidatorFn> = [];
 
   if (generalValidation.avoidFirstAndLastNameInPassword) {
-    const { firstNameFieldKey, lastNameFieldKey, passwordFieldKey } = generalValidation.avoidFirstAndLastNameInPassword;
+    const {firstNameFieldKey, lastNameFieldKey, passwordFieldKey} = generalValidation.avoidFirstAndLastNameInPassword;
     generalValidationErrorsList.push(passwordMustNotHaveFirstAndLastName(firstNameFieldKey, lastNameFieldKey, passwordFieldKey));
   }
 
   return generalValidationErrorsList;
-}
+};
 
 export const getValidatorErrorMessage = (validation: ValidationErrorsWithKnownKeys): Array<string> => {
   const validationErrorMessageList: Array<string> = [];
@@ -114,4 +158,4 @@ export const getValidatorErrorMessage = (validation: ValidationErrorsWithKnownKe
   }
 
   return validationErrorMessageList;
-}
+};

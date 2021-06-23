@@ -27,4 +27,4 @@ export type FormBuilderInput = {
   generalValidation?: GeneralValidationObject;
 };
 
-export type ValidationErrorsWithKnownKeys = {[key in ValidationKey | GeneralValidationKey]?: any }
+export type ValidationErrorsWithKnownKeys = { [key in ValidationKey | GeneralValidationKey]?: any };

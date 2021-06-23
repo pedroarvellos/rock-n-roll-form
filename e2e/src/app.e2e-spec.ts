@@ -14,7 +14,7 @@ describe('Form tests', () => {
     await page.enterValueOnField('lastName', 'Shelby');
     await page.enterValueOnField('email', 'thomas@shelby.co.uk');
     await page.enterValueOnField('password', 'IAmNotBillyKimber876');
-    await page.submitForm()
+    await page.submitForm();
     expect(await page.isConfirmationAlertPresent()).toBe(true);
   });
 
