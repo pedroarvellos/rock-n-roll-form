@@ -1,7 +1,17 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidatorFn } from '@angular/forms';
-import { ControlObject, FormBuilderInput, GeneralValidationObject, ValidationErrorsWithKnownKeys, ValidationObject } from './form-builder.type';
-import { getGeneralValidatorType, getValidatorErrorMessage, getValidatorType } from './validation/form-builder.validation';
+import {
+  ControlObject,
+  FormBuilderInput,
+  GeneralValidationObject,
+  ValidationErrorsWithKnownKeys,
+  ValidationObject
+} from './form-builder.type';
+import {
+  getGeneralValidatorType,
+  getValidatorErrorMessage,
+  getValidatorType
+} from './validation/form-builder.validation';
 
 @Component({
   selector: 'app-form-builder',
@@ -12,9 +22,9 @@ export class FormBuilderComponent implements OnInit {
   @Input()
   public inputList: FormBuilderInput | null = null;
   @Input()
-  public isLoading: boolean = false;
-  @Output() 
-  public submitForm: EventEmitter<any> = new EventEmitter;
+  public isLoading = false;
+  @Output()
+  public submitForm: EventEmitter<any> = new EventEmitter();
   public form: FormGroup | null = null;
 
   constructor(private formBuilder: FormBuilder) {
@@ -22,21 +32,26 @@ export class FormBuilderComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    if(this.inputList) {
-      let controls: {[key: string]: AbstractControl} = {};
-      
+    if (this.inputList) {
+      let controls: { [key: string]: AbstractControl } = {};
+
       this.inputList?.controls.filter((input: ControlObject) => {
-        controls = {... controls, ...{[input.keyName]: this.formBuilder.control('', this.getValidators(input.validationList ? input.validationList : null))}};
+        controls = {
+          ...controls,
+          ...{
+            [input.keyName]: this.formBuilder.control('', this.getValidators(input.validationList ? input.validationList : null))
+          }
+        };
       });
-  
+
       this.form = new FormGroup(controls, this.getGeneralValidators(this.inputList?.generalValidation ? this.inputList.generalValidation : null));
     }
   }
 
-  private getGeneralValidators(generalValidationList: GeneralValidationObject | null) {
+  private getGeneralValidators(generalValidationList: GeneralValidationObject | null): Array<ValidatorFn> {
     let generalValidationErrorsList: Array<ValidatorFn> = [];
 
-    if(generalValidationList) {
+    if (generalValidationList) {
       generalValidationErrorsList = getGeneralValidatorType(generalValidationList);
     }
 
@@ -45,8 +60,8 @@ export class FormBuilderComponent implements OnInit {
 
   private getValidators(validationList: ValidationObject | null): Array<ValidatorFn> {
     let validationErrorsList: Array<ValidatorFn> = [];
-    
-    if(validationList) {
+
+    if (validationList) {
       validationErrorsList = getValidatorType(validationList);
     }
 
@@ -54,14 +69,14 @@ export class FormBuilderComponent implements OnInit {
   }
 
   public getControl(controlName: string): AbstractControl | null {
-    return this.form ? this.form.controls[controlName] : null; 
+    return this.form ? this.form.controls[controlName] : null;
   }
 
   public getErrorMessage(keyName: string): Array<string> {
     const errorObject: ValidationErrorsWithKnownKeys = this.getControl(keyName)?.errors as ValidationErrorsWithKnownKeys;
     let validationErrorMessageList: Array<string> = [];
-    
-    if(errorObject) {
+
+    if (errorObject) {
       validationErrorMessageList = getValidatorErrorMessage(errorObject);
     }
 

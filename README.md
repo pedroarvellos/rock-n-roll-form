@@ -1,6 +1,6 @@
-# Angular Form
+# Rock n Roll Form
 
-This application was created in order to propose how to create nice reusable forms in Angular with reactive forms, and also how to manage the data using NgRx. Yes, I know that for this example a reusable form sounds a bit over-engineering, but the goal is to set a solid ground for an application that could grow in the future, and have multiple pages sharing the same component and using different fields and validations.
+This application was created in order to suggestion how to create nice reusable forms in Angular with reactive forms, and also how to manage the data using NgRx. Yes, I know that for this example a reusable form sounds a bit over-engineering, but the goal is to set a solid ground for an application that could grow in the future, and have multiple pages sharing the same component and using different fields and validations.
 
 Enjoy and feel free to provide nice inputs! 😄🖤
 
